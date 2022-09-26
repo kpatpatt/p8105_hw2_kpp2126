@@ -1,0 +1,11 @@
+---
+title: "p8105_hw2_kpp2126"
+author: "Kevin P. Patterson"
+date: "2022-09-26"
+output: github_document
+---
+
+```{r setup}
+library(tidyverse)
+```
+
