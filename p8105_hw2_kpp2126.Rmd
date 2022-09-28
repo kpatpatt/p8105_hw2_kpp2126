@@ -9,3 +9,24 @@ output: github_document
 library(tidyverse)
 ```
 
+## Problem 1
+
+*Read and clean the data; 
+*retain line, station_name, station latitude / longitude, routes served (route1:route11), entry, vending, entrance_type, and ADA compliance (ada). 
+*Convert the entry variable from character (YES vs NO) to a logical variable (the ifelse or recode function may be useful).
+```{r clean data}
+getwd()
+transit_df =
+  read.csv("../../datascience/p8105_hw2_kpp2126/NYC_Transit_Subway_Entrance_And_Exit_Data.csv") %>%
+  janitor::clean_names()
+
+transit_df = 
+  select(colnames())
+
+```
+
+*Write a short paragraph about this dataset – explain briefly what variables the dataset contains, describe your data cleaning steps so far, and give the dimension (rows x columns) of the resulting dataset. 
+*Are these data tidy?
+
+
+
