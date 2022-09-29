@@ -15,18 +15,26 @@ library(tidyverse)
 *retain line, station_name, station latitude / longitude, routes served (route1:route11), entry, vending, entrance_type, and ADA compliance (ada). 
 *Convert the entry variable from character (YES vs NO) to a logical variable (the ifelse or recode function may be useful).
 ```{r clean data}
-getwd()
+#getwd()
 transit_df =
-  read.csv("../../datascience/p8105_hw2_kpp2126/NYC_Transit_Subway_Entrance_And_Exit_Data.csv") %>%
-  janitor::clean_names()
-
-transit_df = 
-  select(colnames())
-
+  read.csv(
+    "../../datascience/p8105_hw2_kpp2126/NYC_Transit_Subway_Entrance_And_Exit_Data.csv") %>%
+  janitor::clean_names() %>%
+  select(
+    line, station_name, station_latitude, station_longitude, route1:route11, entry, vending, entrance_type, ada) %>%
+  mutate(
+    entry = ifelse(entry == "YES", TRUE, FALSE))
 ```
 
 *Write a short paragraph about this dataset – explain briefly what variables the dataset contains, describe your data cleaning steps so far, and give the dimension (rows x columns) of the resulting dataset. 
 *Are these data tidy?
+
+*This dataset has `dim(trans_df)` observations and column variables respectively.
+
+Answer the following questions using these data:
+
+*How many distinct stations are there? Note that stations are identified both by name and by line (e.g. 125th St 8th Avenue; 125st Broadway; 125st Lenox); the distinct function may be useful here.
+
 
 
 
