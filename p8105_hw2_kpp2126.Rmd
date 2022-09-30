@@ -71,7 +71,17 @@ transit_df %>%
 ```
 
 *Reformat data so that route number and route name are distinct variables. How many distinct stations serve the A train? Of the stations that serve the A train, how many are ADA compliant?
-```{r reformat}
 
+There are `60` distinct stations that serve the A train, and of these stations there are `17` stations are ADA compliant.
+```{r reformat}
+transit_df_tidy %>%
+  filter(train == "A") %>%
+  select(station_name, line) %>%
+  distinct
+
+transit_df_tidy %>%
+  filter(train == "A", ada == TRUE) %>%
+  select(station_name, line) %>%
+  distinct
 ```
 
