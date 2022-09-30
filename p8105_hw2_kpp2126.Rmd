@@ -41,7 +41,7 @@ transit_df_tidy =
 *Write a short paragraph about this dataset – explain briefly what variables the dataset contains, describe your data cleaning steps so far, and give the dimension (rows x columns) of the resulting dataset. 
 *Are these data tidy?
 
-The resulting dataset has `dim(trans_df)` observations and column variables respectively. Among the `ncol(transit_df)` columns,  there are a mixture of numeric, logical, and character vectors in the dataframe. Despite there being `nrow(transit_df)` observations, these do not represent the true distinct stations because there are duplicates. This is due to the dataset being in wide format, made to accommodate for columns that were in the larger dataset. Thus, the current dataframe is not tidy and I run an example of tidying the dataframe to a longer format, making the `route1:route11` columns into a single variable and its values to another variable called `train`. The dimensions of the tidied dataframe are `dim(transit_df_tidy)` observations and columns variables respectively, reflecting the longer formatted dataframe.
+The resulting dataset has `r dim(transit_df)` observations and column variables respectively. Among the `r ncol(transit_df)` columns,  there are a mixture of numeric, logical, and character vectors in the dataframe. Despite there being `r nrow(transit_df)` observations, these do not represent the true distinct stations because there are duplicates. This is due to the dataset being in wide format, made to accommodate for columns that were in the larger dataset. Thus, the current dataframe is not tidy and I run an example of tidying the dataframe to a longer format, making the `route1:route11` columns into a single variable and its values to another variable called `train`. The dimensions of the tidied dataframe are `r dim(transit_df_tidy)` observations and columns variables respectively, reflecting the longer formatted dataframe.
 
 *How many distinct stations are there? Note that stations are identified both by name and by line (e.g. 125th St 8th Avenue; 125st Broadway; 125st Lenox); the distinct function may be useful here.
 There are `465` distinct stations that are identified both by name and by line.
@@ -62,7 +62,7 @@ transit_df %>%
 ```
 
 *What proportion of station entrances / exits without vending allow entrance?
-The proportion of station entrances/exits without vending that allow entrance is `mean(transit_df[transit_df$vending == 'NO', 'entry'])`.
+The proportion of station entrances/exits without vending that allow entrance is `r mean(transit_df[transit_df$vending == 'NO', 'entry'])`.
 ```{r proportion}
 transit_df %>%
   filter(vending == "NO") %>%
