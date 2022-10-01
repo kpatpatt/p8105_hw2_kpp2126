@@ -16,7 +16,6 @@ library(dplyr)
 *retain line, station_name, station latitude / longitude, routes served (route1:route11), entry, vending, entrance_type, and ADA compliance (ada). 
 *Convert the entry variable from character (YES vs NO) to a logical variable (the ifelse or recode function may be useful).
 ```{r clean data}
-#getwd()
 transit_df =
   read.csv(
     "../../datascience/p8105_hw2_kpp2126/NYC_Transit_Subway_Entrance_And_Exit_Data.csv") %>%
@@ -26,7 +25,7 @@ transit_df =
   mutate(
     entry = ifelse(entry == "YES", TRUE, FALSE))
 
-#Tidying transit dataframe
+#Tidying transit data frame
 transit_df_tidy = transit_df %>%
   mutate_at(c('route8', 'route9', 'route10', 'route11'), as.character)
 
@@ -50,6 +49,10 @@ There are `465` distinct stations that are identified both by name and by line.
 transit_df %>%
   select(station_name, line) %>%
   distinct
+
+transit_df %>% 
+  group_by(station_name) %>% 
+  distinct(line)
 ```
 
 *How many stations are ADA compliant?
@@ -84,4 +87,7 @@ transit_df_tidy %>%
   select(station_name, line) %>%
   distinct
 ```
+
+## Problem 2
+
 
