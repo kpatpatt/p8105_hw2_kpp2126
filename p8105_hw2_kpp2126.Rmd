@@ -99,8 +99,6 @@ Read and clean the Mr. Trash Wheel sheet:
 *round the number of sports balls to the nearest integer and converts the result to an integer variable (using as.integer)
 *Use a similar process to import, clean, and organize the data for Professor Trash Wheel, and combine this with the Mr. Trash Wheel dataset to produce a single tidy dataset. To keep track of which Trash Wheel is which, you may need to add an additional variable to both datasets before combining.
 
-*Write a paragraph about these data; you are encouraged to use inline R. Be sure to note the number of observations in the resulting dataset, and give examples of key variables. For available data, what was the total weight of trash collected by Professor Trash Wheel? What was the total number of sports balls collected by Mr. Trash Wheel in 2020?
-
 ```{r load data}
 trashwheel_df =
   readxl::read_excel(
@@ -134,10 +132,34 @@ janitor::compare_df_cols(trashwheel_df, professortrashwheel_df)
 combinedtrash_df = 
   bind_rows(trashwheel_df, professortrashwheel_df)
 
-skimr::skim(professortrashwheel_df)
-
+dim(combinedtrash_df)
 #(1)specify sheet ;(2)omit non-data entires;(3)use arguments in read_excel
 ```
 
+*Write a paragraph about these data; you are encouraged to use inline R. Be sure to note the number of observations in the resulting dataset, and give examples of key variables.
+
+The `combinedtrash_df` has `r nrow(combinedtrash_df)` observations and 'r ncol(combinedtrash_df)` variables. Of these variables, `
+
+* For available data, what was the total weight of trash collected by Professor Trash Wheel? What was the total number of sports balls collected by Mr. Trash Wheel in 2020?
+```{r trash analysis}
+#baseR calculations
+sum(professortrashwheel_df$weight_tons, na.rm =T)
+aggregate(combinedtrash_df$weight_tons, list(combinedtrash_df$sheet_type), FUN=sum) 
+sum(trashwheel_df$sports_balls, year=2020, na.rm=T)
+aggregate(combinedtrash_df, 
+          list(type = sheet_type,
+               year = year == "2020"),
+          FUN=sum) 
+
+#tidyverse calculations
+combinedtrash_df %>%
+  group_by(sheet_type) %>%
+  summarise(sum = sum(weight_tons))
+
+combinedtrash_df %>%
+  group_by(sheet_type) %>%
+  filter(year == "2020") %>%
+  summarise(sum = sum(sports_balls))
+```
 
 
