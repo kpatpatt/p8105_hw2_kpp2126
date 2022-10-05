@@ -112,7 +112,7 @@ trashwheel_df =
   drop_na(dumpster) %>%
   mutate(sports_balls = round(sports_balls),
          sports_balls = as.integer(sports_balls),
-         homes_powered = as.integer(homes_powered)) %>% #made this the same as professor df to keep sameness before binding
+         homes_powered = as.integer(homes_powered)) %>% #made this the same as professor_df to keep sameness before binding
   add_column(sheet_type = "mister")
 
 professortrashwheel_df =
@@ -125,7 +125,7 @@ professortrashwheel_df =
   drop_na(dumpster) %>%
   mutate(homes_powered = round(homes_powered),
          homes_powered = as.integer(homes_powered),
-         year = as.character(year)) %>% #does this need to be the same as trashwheel?
+         year = as.character(year)) %>% #does this need to be the same as trashwheel_df?
   add_column(sheet_type = "professor",
              sports_balls = as.integer(NA))
 
