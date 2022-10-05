@@ -106,15 +106,35 @@ trashwheel_df =
   readxl::read_excel(
     "../../datascience/p8105_hw2_kpp2126/Trash Wheel Collection Data.xlsx",
     sheet = "Mr. Trash Wheel",
+    skip = 1,
     range = cell_cols("A:N")) %>%
   janitor::clean_names() %>%
   drop_na(dumpster) %>%
   mutate(sports_balls = round(sports_balls),
-         sports_balls = as.integer(sports_balls))
+         sports_balls = as.integer(sports_balls),
+         homes_powered = as.integer(homes_powered)) %>% #made this the same as professor df to keep sameness before binding
+  add_column(sheet_type = "mister")
 
-trashwheeldf<-round(trashwheel_df$sports_balls, digits=0)
-  
-skimr::skim(trashwheel_df)
+professortrashwheel_df =
+  readxl::read_excel(
+    "../../datascience/p8105_hw2_kpp2126/Trash Wheel Collection Data.xlsx",
+    sheet = "Professor Trash Wheel",
+    skip = 1,
+    range = cell_cols("A:M")) %>%
+  janitor::clean_names() %>%
+  drop_na(dumpster) %>%
+  mutate(homes_powered = round(homes_powered),
+         homes_powered = as.integer(homes_powered),
+         year = as.character(year)) %>% #does this need to be the same as trashwheel?
+  add_column(sheet_type = "professor",
+             sports_balls = as.integer(NA))
+
+janitor::compare_df_cols(trashwheel_df, professortrashwheel_df)
+
+combinedtrash_df = 
+  bind_rows(trashwheel_df, professortrashwheel_df)
+
+skimr::skim(professortrashwheel_df)
 
 #(1)specify sheet ;(2)omit non-data entires;(3)use arguments in read_excel
 ```
