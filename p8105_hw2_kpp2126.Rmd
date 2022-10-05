@@ -93,6 +93,7 @@ transit_df_tidy %>%
 Read and clean the Mr. Trash Wheel sheet:
 
 *specify the sheet in the Excel file and to omit non-data entries (rows with notes / figures; columns containing notes) using arguments in read_excel
+
 *use reasonable variable names
 *omit rows that do not include dumpster-specific data
 *round the number of sports balls to the nearest integer and converts the result to an integer variable (using as.integer)
@@ -102,12 +103,21 @@ Read and clean the Mr. Trash Wheel sheet:
 
 ```{r load data}
 trashwheel_df =
-  openxlsx::read.xlsx(
-    "../../datascience/p8105_hw2_kpp2126/Trash-Wheel-Collection-Totals-7-2020-2.xlsx") %>%
-  janitor::clean_names()
+  readxl::read_excel(
+    "../../datascience/p8105_hw2_kpp2126/Trash Wheel Collection Data.xlsx",
+    sheet = "Mr. Trash Wheel",
+    range = cell_cols("A:N")) %>%
+  janitor::clean_names() %>%
+  drop_na(dumpster) %>%
+  mutate(sports_balls = round(sports_balls),
+         sports_balls = as.integer(sports_balls))
 
+trashwheeldf<-round(trashwheel_df$sports_balls, digits=0)
+  
+skimr::skim(trashwheel_df)
+
+#(1)specify sheet ;(2)omit non-data entires;(3)use arguments in read_excel
 ```
-
 
 
 
