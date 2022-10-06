@@ -13,17 +13,15 @@ library(dplyr)
 ## Problem 1
 
 *Read and clean the data; 
-*retain line, station_name, station latitude / longitude, routes served (route1:route11), entry, vending, entrance_type, and ADA compliance (ada). 
-*Convert the entry variable from character (YES vs NO) to a logical variable (the ifelse or recode function may be useful).
+(1)retain line, station_name, station latitude / longitude, routes served (route1:route11), entry, vending, entrance_type, and ADA compliance (ada). 
+(2)Convert the entry variable from character (YES vs NO) to a logical variable (the `ifelse` or `recode` function may be useful).
 ```{r clean data}
 transit_df =
   read.csv(
     "../../datascience/p8105_hw2_kpp2126/NYC_Transit_Subway_Entrance_And_Exit_Data.csv") %>%
   janitor::clean_names() %>%
-  select(
-    line, station_name, station_latitude, station_longitude, route1:route11, entry, vending, entrance_type, ada) %>%
-  mutate(
-    entry = ifelse(entry == "YES", TRUE, FALSE))
+  select(line, station_name, station_latitude, station_longitude, route1:route11, entry, vending, entrance_type, ada) %>%
+  mutate(entry = ifelse(entry == "YES", TRUE, FALSE))
 
 #Tidying transit data frame
 transit_df_tidy = transit_df %>%
@@ -40,9 +38,10 @@ transit_df_tidy =
 *Write a short paragraph about this dataset – explain briefly what variables the dataset contains, describe your data cleaning steps so far, and give the dimension (rows x columns) of the resulting dataset. 
 *Are these data tidy?
 
-The resulting dataset has `r dim(transit_df)` observations and column variables respectively. Among the `r ncol(transit_df)` columns,  there are a mixture of numeric, logical, and character vectors in the dataframe. Despite there being `r nrow(transit_df)` observations, these do not represent the true distinct stations because there are duplicates. This is due to the dataset being in wide format, made to accommodate for columns that were in the larger dataset. Thus, the current dataframe is not tidy and I run an example of tidying the dataframe to a longer format, making the `route1:route11` columns into a single variable and its values to another variable called `train`. The dimensions of the tidied dataframe are `r dim(transit_df_tidy)` observations and columns variables respectively, reflecting the longer formatted dataframe.
+The resulting dataset has `r dim(transit_df)` observations and column variables respectively. Among the `r ncol(transit_df)` columns,  there are a mixture of numeric, logical, and character vectors in the dataframe. Despite there being `r nrow(transit_df)` observations, these do not represent the true distinct stations because there are duplicates. This is due to the dataset being in wide format, made to accommodate for columns that were in the larger dataset. Thus, the current dataframe is not tidy and I run an example of tidying the dataframe to a longer format, making the `route1:route11` columns into a single variable and its values to another variable called `train`. The dimensions of the tidied dataframe, `transit_df_tidy` are `r dim(transit_df_tidy)` observations and column variables respectively, reflecting the longer formatted dataframe.
 
-*How many distinct stations are there? Note that stations are identified both by name and by line (e.g. 125th St 8th Avenue; 125st Broadway; 125st Lenox); the distinct function may be useful here.
+*How many distinct stations are there? Note that stations are identified both by name and by line (e.g. 125th St 8th Avenue; 125st Broadway; 125st Lenox); the `distinct` function may be useful here.
+
 There are `465` distinct stations that are identified both by name and by line.
 
 ```{r distinct stations}
@@ -73,16 +72,17 @@ transit_df %>%
   mean
 ```
 
-*Reformat data so that route number and route name are distinct variables. How many distinct stations serve the A train? Of the stations that serve the A train, how many are ADA compliant?
+(1)Reformat data so that route number and route name are distinct variables. 
+*How many distinct stations serve the A train? Of the stations that serve the A train, how many are ADA compliant?
 
-There are `60` distinct stations that serve the A train, and of these stations there are `17` stations are ADA compliant.
+There are `r count(distinct_stations_A)` distinct stations that serve the A train, and of these stations there are `r count(distinct_stations_A_ADA)` stations are ADA compliant.
 ```{r reformat}
-transit_df_tidy %>%
+distinct_stations_A <- transit_df_tidy %>% #assigned to a df to call in inlineR
   filter(train == "A") %>%
   select(station_name, line) %>%
   distinct
 
-transit_df_tidy %>%
+distinct_stations_A_ADA <- transit_df_tidy %>% #assigned to a df to call in inlineR
   filter(train == "A", ada == TRUE) %>%
   select(station_name, line) %>%
   distinct
@@ -90,30 +90,33 @@ transit_df_tidy %>%
 
 ## Problem 2
 
-Read and clean the Mr. Trash Wheel sheet:
+*Read and clean the Mr. Trash Wheel sheet:
 
-*specify the sheet in the Excel file and to omit non-data entries (rows with notes / figures; columns containing notes) using arguments in read_excel
+(1)specify the `sheet = "Mr Trash Wheel` in the Excel file and to omit non-data entries (rows with notes / figures; columns containing notes) using `skip` and `range` in read_excel
+(2)use reasonable variable names
+(3)omit rows that do not include dumpster-specific data with `drop_na(dumpster)`
+(4)round the number of sports balls to the nearest integer and converts the result to an integer variable (using as.integer)
+(4a)To keep track of which Trash Wheel is which, you may need to add an additional variable to both datasets before combining.
 
-*use reasonable variable names
-*omit rows that do not include dumpster-specific data
-*round the number of sports balls to the nearest integer and converts the result to an integer variable (using as.integer)
-*Use a similar process to import, clean, and organize the data for Professor Trash Wheel, and combine this with the Mr. Trash Wheel dataset to produce a single tidy dataset. To keep track of which Trash Wheel is which, you may need to add an additional variable to both datasets before combining.
-(1)specify sheet ;(2)omit non-data entires;(3)use arguments in read_excel
-
-```{r load clean data}
+```{r load clean Mr. Trash Wheel}
 trashwheel_df =
   readxl::read_excel(
     "../../datascience/p8105_hw2_kpp2126/Trash Wheel Collection Data.xlsx",
     sheet = "Mr. Trash Wheel",
-    skip = 1,
+    skip = 1, #may be extra, but added as cautionary measure
     range = cell_cols("A:N")) %>%
   janitor::clean_names() %>%
-  drop_na(dumpster) %>%
+  drop_na(dumpster) %>% #specified for the column opposed to dropping the row for any NA's across
   mutate(sports_balls = round(sports_balls),
          sports_balls = as.integer(sports_balls),
-         homes_powered = as.integer(homes_powered)) %>% #made this the same as professor_df to keep sameness before binding
-  add_column(sheet_type = "mister")
+         homes_powered = as.integer(homes_powered)) %>% #matched this with professortrashwheel_df for binding as cautionary measure
+  add_column(trash_wheel_type = "mister") #identifying the dataframe before binding
+```
 
+
+(5)Use a similar process to import, clean, and organize the data for Professor Trash Wheel;
+(5a)To keep track of which Trash Wheel is which, you may need to add an additional variable to both datasets before combining.
+```{r load clean Prof Trash Wheel}
 professortrashwheel_df =
   readxl::read_excel(
     "../../datascience/p8105_hw2_kpp2126/Trash Wheel Collection Data.xlsx",
@@ -124,64 +127,113 @@ professortrashwheel_df =
   drop_na(dumpster) %>%
   mutate(homes_powered = round(homes_powered),
          homes_powered = as.integer(homes_powered),
-         year = as.character(year)) %>% #does this need to be the same as trashwheel_df?
-  add_column(sheet_type = "professor",
-             sports_balls = as.integer(NA))
+         year = as.character(year)) %>% #matched this with trashwheel_df, since we are answering for a single year (2020) I kept it coded as.character but could change for future considerations that require panel of years or increments of years which require as.numeric(year)
+  add_column(trash_wheel_type = "professor",
+             sports_balls = as.integer(NA)) #added as cautionary measure before binding
+```
 
-#janitor::compare_df_cols(trashwheel_df, professortrashwheel_df)
 
-combinedtrash_df = 
+(6)combine this with the Mr. Trash Wheel dataset to produce a single tidy dataset. 
+```{r combine}
+#janitor::compare_df_cols(trashwheel_df, professortrashwheel_df) used to check data frames matched before binding
+combinedtrashwheel_df = 
   bind_rows(trashwheel_df, professortrashwheel_df)
+skimr::skim(combinedtrashwheel_df)
 ```
 
 *Write a paragraph about these data; you are encouraged to use inline R. Be sure to note the number of observations in the resulting dataset, and give examples of key variables.
 
-The `combinedtrash_df` has `r nrow(combinedtrash_df)` observations and `r ncol(combinedtrash_df)` variables. Of these variables,
+The `combinedtrashwheel_df` has `r nrow(combinedtrashwheel_df)` observations and `r ncol(combinedtrashwheel_df)` variables. Of these `r ncol(combinedtrashwheel_df)` variables, there are `r nrow(trashwheel_df)` dumpsters for Mr Trash Wheel, but for Professor Trash Wheel there are `r nrow(professortrashwheel_df)` dumpsters. The Professor Trash Wheel dumpsters do not have values for sports balls, but both data frames collected the same remaining `r ncol(trashwheel_df)-1` variables. Some other variables describe `weight_tons`, measured in tons, and `volume_cubic_yards`, measured in cubic yards and the `date` those values were recorded. The rest of the variables detail the type of trash, such as `sports_balls` and `glass_bottles`, and lastly a measure of homes that could be powered (`homes_powered`) based on the trash collected and processed.
 
-* For available data, what was the total weight of trash collected by Professor Trash Wheel? What was the total number of sports balls collected by Mr. Trash Wheel in 2020?
-```{r trash analysis}
-#baseR calculations
-sum(professortrashwheel_df$weight_tons, na.rm =T)
-aggregate(combinedtrash_df$weight_tons, list(combinedtrash_df$sheet_type), FUN=sum) 
-sum(trashwheel_df$sports_balls, year=2020, na.rm=T)
-aggregate(combinedtrash_df, 
-          list(type = sheet_type,
-               year = year == "2020"),
-          FUN=sum) 
-
-#tidyverse calculations
-combinedtrash_df %>%
-  group_by(sheet_type) %>%
+*For available data, what was the total weight of trash collected by Professor Trash Wheel? 
+```{r total weight}
+total_weight_mrtrashwheel <- combinedtrashwheel_df %>%
+  group_by(trash_wheel_type) %>%
   summarise(sum = sum(weight_tons))
+```
+The total weight of trash collected by Professor Trash Wheel was (baseR) `sum(professortrashwheel_df$weight_tons, na.rm =T)` tons, alternatively using the data frame created by method of tidyverse `r total_weight_mrtrashwheel[2, 2]` tons.
 
-combinedtrash_df %>%
-  group_by(sheet_type) %>%
+*What was the total number of sports balls collected by Mr. Trash Wheel in 2020?
+```{r total balls}
+total_balls_2020 <- combinedtrashwheel_df %>%
+  group_by(trash_wheel_type) %>%
   filter(year == "2020") %>%
   summarise(sum = sum(sports_balls))
 ```
+The total number of sports balls collected by Mr. Trash Wheel in 2020 was `r total_balls_2020[1, 2]` balls.
+
 ## Problem 3
 
 This problem uses the FiveThirtyEight data; these data were gathered to create the interactive graphic on this page. In particular, we’ll use the data in pols-month.csv, unemployment.csv, and snp.csv. 
 
 *Our goal is to merge these into a single data frame using year and month as keys across datasets.*
 
-*First, clean the data in pols-month.csv. Use separate() to break up the variable mon into integer variables year, month, and day; replace month number with month name; create a president variable taking values gop and dem, and remove prez_dem and prez_gop; and remove the day variable.
-
-Second, clean the data in snp.csv using a similar process to the above. For consistency across datasets, arrange according to year and month, and organize so that year and month are the leading columns.
-
-Third, tidy the unemployment data so that it can be merged with the previous datasets. This process will involve switching from “wide” to “long” format; ensuring that key variables have the same name; and ensuring that key variables take the same values.
-
-Join the datasets by merging snp into pols, and merging unemployment into the result.
-
-Write a short paragraph about these datasets. Explain briefly what each dataset contained, and describe the resulting dataset (e.g. give the dimension, range of years, and names of key variables).
-
-Note: we could have used a date variable as a key instead of creating year and month keys; doing so would help with some kinds of plotting, and be a more accurate representation of the data. Date formats are tricky, though. For more information check out the lubridate package in the tidyverse.
-
-```{r load clean data}
+*First, clean the data in pols-month.csv. 
+(1)Use `separate()` to break up the variable `mon` into integer variables `year`, `month`, and `day`; 
+(2)replace month number with month name using `month.abb`; 
+(3)create a `president` variable taking values gop and dem;
+(4)remove `prez_dem` and `prez_gop` using `starts_with()`;
+(5)remove the `day` variable using `select()`
+```{r pols}
 pols_df = 
-  read_csv("../../datascience/p8105_hw2_kpp2126/pols-month.csv") %>%
-  separate(mon, into = c("year", "month", "day"), convert = T) %>%
-  mutate(month = month.abb[month])
+  read_csv("../../datascience/p8105_hw2_kpp2126/pols-month.csv",
+           show_col_types = FALSE) %>% #was getting a warning for deliminator for my months so I set it to false
+  janitor::clean_names() %>%
+  separate(mon, into = c("year", "month", "day"), convert=T) %>%
+  mutate(month = month.abb[month], #I used abbreviation to have tidier code so I don't have to recode the unemployment.csv month variables
+         president = recode(prez_gop, #curious if set_value_labels would be any different here
+                            "0" = "dem", 
+                            "1" = "gop", 
+                            "2" = "gop")) %>% 
+  select(-starts_with("prez"), -day)
 ```
 
+*Second, clean the data in snp.csv using a similar process to the above. 
+(1)arrange according to year and month;
+(2)organize so that year and month are the leading columns.
+```{r snp}
+snp_df =
+  read_csv("../../datascience/p8105_hw2_kpp2126/snp.csv",
+           show_col_types = FALSE) %>% #was getting a warning for deliminator for my months so I set it to false
+  janitor::clean_names() %>%
+  separate(date, into = c("year", "month", "day"), convert=T) %>%
+  mutate(month = month.abb[month],
+         year90s = year + 1900,
+         year00s = year + 2000,
+         year = case_when(year > 45 ~ year90s, T ~ year00s)) %>%
+  arrange(year, month) %>%
+  select(year, month, close)
+```
+
+*Third, tidy the unemployment data so that it can be merged with the previous datasets. 
+(1)This process will involve switching from “wide” to “long” format using `pivot_longer`; 
+(2)ensuring that key variables have the same name;
+(3)ensuring that key variables take the same values.
+```{r unemployment}
+unemploy_df =
+  read_csv("../../datascience/p8105_hw2_kpp2126/unemployment.csv",
+           show_col_types = FALSE) %>% #was getting a warning for deliminator for my months so I set it to false
+  rename(year = Year) %>%
+  pivot_longer(Jan:Dec,
+               names_to = "month", 
+               values_to = "unemployment")
+```
+
+*Join the datasets by merging snp into pols, and merging unemployment into the result.
+```{r left join}
+#janitor::compare_df_cols(pols_df, snp_df)
+combinedp3_df = 
+  left_join(pols_df, snp_df) %>%
+  left_join(., unemploy_df)
+
+str(combinedp3_df)
+```
+
+*Write a short paragraph about these datasets. 
+(1)Explain briefly what each dataset contained;
+(2)describe the resulting dataset (e.g. give the dimension, range of years, and names of key variables).
+
+
+
+Note: we could have used a date variable as a key instead of creating year and month keys; doing so would help with some kinds of plotting, and be a more accurate representation of the data. Date formats are tricky, though. For more information check out the lubridate package in the tidyverse.
 
