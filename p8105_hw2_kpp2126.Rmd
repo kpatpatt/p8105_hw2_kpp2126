@@ -8,6 +8,8 @@ output: github_document
 ```{r setup}
 library(tidyverse)
 library(dplyr)
+library(readr)
+library(readxl)
 ```
 
 ## Problem 1
@@ -100,7 +102,7 @@ trashwheel_df =
     "../../datascience/p8105_hw2_kpp2126/Trash Wheel Collection Data.xlsx",
     sheet = "Mr. Trash Wheel",
     skip = 1, #may be extra, but added as cautionary measure
-    range = cell_cols("A:N")) %>%
+    range = cellranger::cell_cols("A:N")) %>%
   janitor::clean_names() %>%
   drop_na(dumpster) %>% #specified for the column opposed to dropping the row for any NA's across
   mutate(sports_balls = round(sports_balls),
@@ -134,7 +136,7 @@ professortrashwheel_df =
 #janitor::compare_df_cols(trashwheel_df, professortrashwheel_df) used to check data frames matched before binding
 combinedtrashwheel_df = 
   bind_rows(trashwheel_df, professortrashwheel_df)
-skimr::skim(combinedtrashwheel_df)
+#skimr::skim(combinedtrashwheel_df)
 ```
 
 *Write a paragraph about these data; you are encouraged to use inline R. Be sure to note the number of observations in the resulting dataset, and give examples of key variables.
