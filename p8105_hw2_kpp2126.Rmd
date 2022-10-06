@@ -149,7 +149,7 @@ total_weight_mrtrashwheel <- combinedtrashwheel_df %>%
   group_by(trash_wheel_type) %>%
   summarise(sum = sum(weight_tons))
 ```
-The total weight of trash collected by Professor Trash Wheel was (baseR) `sum(professortrashwheel_df$weight_tons, na.rm =T)` tons, alternatively using the data frame created by method of tidyverse `r total_weight_mrtrashwheel[2, 2]` tons.
+The total weight of trash collected by Professor Trash Wheel was (baseR) `r `sum(professortrashwheel_df$weight_tons, na.rm =T)` tons, alternatively using the data frame created by method of tidyverse `r total_weight_mrtrashwheel[2, 2]` tons.
 
 *What was the total number of sports balls collected by Mr. Trash Wheel in 2020?
 ```{r total balls}
