@@ -27,6 +27,7 @@ transit_df =
 transit_df_tidy = transit_df %>%
   mutate_at(c('route8', 'route9', 'route10', 'route11'), as.character)
 
+#Need to pivot longer to make route its own variable
 transit_df_tidy = 
   pivot_longer(
     transit_df_tidy,
@@ -42,40 +43,34 @@ The resulting dataset has `r dim(transit_df)` observations and column variables 
 
 *How many distinct stations are there? Note that stations are identified both by name and by line (e.g. 125th St 8th Avenue; 125st Broadway; 125st Lenox); the `distinct` function may be useful here.
 
-There are `465` distinct stations that are identified both by name and by line.
 
 ```{r distinct stations}
-transit_df %>%
+distinct_stations <- transit_df %>%
   select(station_name, line) %>%
   distinct
-
-transit_df %>% 
-  group_by(station_name) %>% 
-  distinct(line)
 ```
+There are `r pull(count(distinct_stations))` distinct stations that are identified both by name and by line.
 
 *How many stations are ADA compliant?
-There are `84` distinct stations, identified both by name and by line, that are ADA compliant.
 ```{r ada compliance}
-transit_df %>%
+ADA_stations <- transit_df %>%
   filter(ada == TRUE) %>%
   select(station_name, line) %>%
   distinct
 ```
+There are `r pull(count(ADA_stations))` distinct stations, identified both by name and by line, that are ADA compliant.
 
 *What proportion of station entrances / exits without vending allow entrance?
-The proportion of station entrances/exits without vending that allow entrance is `r mean(transit_df[transit_df$vending == 'NO', 'entry'])`.
 ```{r proportion}
 transit_df %>%
   filter(vending == "NO") %>%
   pull(entry) %>%
   mean
 ```
+The proportion of station entrances/exits without vending that allow entrance is `r mean(transit_df[transit_df$vending == 'NO', 'entry'])`.
 
 (1)Reformat data so that route number and route name are distinct variables. 
 *How many distinct stations serve the A train? Of the stations that serve the A train, how many are ADA compliant?
-
-There are `r count(distinct_stations_A)` distinct stations that serve the A train, and of these stations there are `r count(distinct_stations_A_ADA)` stations are ADA compliant.
 ```{r reformat}
 distinct_stations_A <- transit_df_tidy %>% #assigned to a df to call in inlineR
   filter(train == "A") %>%
@@ -87,6 +82,7 @@ distinct_stations_A_ADA <- transit_df_tidy %>% #assigned to a df to call in inli
   select(station_name, line) %>%
   distinct
 ```
+There are `r count(distinct_stations_A)` distinct stations that serve the A train, and of these stations there are `r count(distinct_stations_A_ADA)` stations are ADA compliant.
 
 ## Problem 2
 
@@ -232,8 +228,7 @@ str(combinedp3_df)
 *Write a short paragraph about these datasets. 
 (1)Explain briefly what each dataset contained;
 (2)describe the resulting dataset (e.g. give the dimension, range of years, and names of key variables).
+The `pols_df` contains `r nrow(pols_df)` observations and `r ncol(pols_df)` variables that detail the political party (democrat or republican) for `president` (binary), governors `gov_` (continuous), senators `sen_` (continuous), and representatives `rep_` (continuous) between the years 1947-2015. The `snp_df` contains `r nrow(snp_df)` observations and `r ncol(snp_df)` variables. The `close` (continuous) variable indicates the closing value of the Standard & Poor's stock index on the corresponding date between years 2001-2012. The `unemploy_df` has `r nrow(unemploy_df)` observations and `r ncol(unemploy_df)` variables. The `unemployment` variable details the percentage of unemployment on the corresponding year and month, between years 1948-2015.
 
-
-
-Note: we could have used a date variable as a key instead of creating year and month keys; doing so would help with some kinds of plotting, and be a more accurate representation of the data. Date formats are tricky, though. For more information check out the lubridate package in the tidyverse.
+The resulting data set `combinedp3_df` has `r nrow(combinedp3_df)` observations and `r ncol(combinedp3_df)` variables. The combined data set contains the same variables previously described but now has a combined range of years starting from 1947-2015. I used a left join to ensure that the larger data frame `pols_df` did not lose any observations when joining with the smaller data frame `snp_df`. The `unemployment` and `close` variables were added to the existing `pols_df` variables so that now there is a corresponding row of information related to `president` and other government positions' political parties.
 
